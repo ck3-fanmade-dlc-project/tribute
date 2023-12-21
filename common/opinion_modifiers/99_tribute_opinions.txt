@@ -1,0 +1,20 @@
+﻿refused_tribute_opinion = {
+	opinion = -20
+	monthly_change = 0.15
+	decaying = yes
+	stacking = yes
+}
+
+broke_tributary_relation_opinion = {
+	opinion = -50
+	monthly_change = 0.15
+	decaying = yes
+	stacking = yes
+}
+
+abandoned_tributary_relation_opinion = {
+	opinion = -50
+	monthly_change = 0.15
+	decaying = yes
+	stacking = yes
+}

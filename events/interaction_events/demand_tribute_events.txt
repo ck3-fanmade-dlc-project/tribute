@@ -1,0 +1,135 @@
+﻿namespace = demand_tribute
+
+demand_tribute.0001 = {
+	type = letter_event
+	sender = scope:overload
+
+	opening = demand_tribute.0001.opening
+	desc = demand_tribute.0001.desc
+
+	trigger = {
+		is_landed = yes
+
+		AND = {
+			scope:tributary = { has_variable = is_tributary }
+			scope:tributary = { has_variable = overload }
+			scope:tributary = { var:overload = scope:overload }
+
+			scope:overload = {
+				is_target_in_variable_list = {
+					name = tributaries
+					target = scope:tributary
+				}
+			}
+		}
+	}
+
+	on_trigger_fail = {
+		scope:tributary = { remove_variable = is_tributary }
+		scope:tributary = { remove_variable = overload }
+
+		scope:overload = {
+			remove_list_variable = {
+				name = tributaries
+				target = scope:tributary
+			}
+		}
+	}
+
+	after = {
+		# 停戦追加
+		scope:overload = {
+			add_truce_both_ways = {
+				character = scope:tributary
+				days = 365
+				name = TRUCE_TRIBUTE
+			}
+		}
+		scope:recipient = {
+			trigger_event = {
+				id = demand_tribute.0001
+				days = 364
+			}
+		}
+	}
+
+	# Ok. I will pay
+	option = {
+		name = demand_tribute.0001.a
+		# 朝貢
+		scope:tributary = {
+			if = { # 月収が0より大きければ
+				limit = {
+					monthly_character_income > 0
+				}
+				# 年間収入の1/4つまり、3ヶ月分を支払い要求
+				pay_short_term_gold = {
+					target = scope:overload
+					gold = {
+						value = 0
+						add = {
+							value = monthly_character_income
+							multiply = 3.0
+						}
+					}
+				}
+			}
+			else = { # 赤字であれば、所有するタイトルの大きさで決める
+				if = {
+					limit = { highest_held_title_tier = tier_barony }
+					pay_short_term_gold = {
+						target = scope:overload
+						gold = { value = static_tribute_gold_barony }
+					}
+				}
+				else_if = {
+					limit = { highest_held_title_tier = tier_county }
+					pay_short_term_gold = {
+						target = scope:overload
+						gold = { value = static_tribute_gold_county }
+					}
+				}
+				else_if = {
+					limit = { highest_held_title_tier = tier_barony }
+					pay_short_term_gold = {
+						target = scope:overload
+						gold = { value = static_tribute_gold_barony }
+					}
+				}
+				else_if = {
+					limit = { highest_held_title_tier = tier_duchy }
+					pay_short_term_gold = {
+						target = scope:overload
+						gold = { value = static_tribute_gold_duchy }
+					}
+				}
+				else_if = {
+					limit = { highest_held_title_tier = tier_kingdom }
+					pay_short_term_gold = {
+						target = scope:overload
+						gold = { value = static_tribute_gold_kingdom }
+					}
+				}
+				else_if = {
+					limit = { highest_held_title_tier = tier_empire }
+					pay_short_term_gold = {
+						target = scope:overload
+						gold = { value = static_tribute_gold_empire }
+					}
+				}
+			}
+		}
+	}
+
+	# Refuse. I will not pay
+	option = {
+		name = demand_tribute.0001.b
+		
+		scope:overload = {
+			add_opinion = {
+				target = scope:tributary
+				modifier = refused_tribute_opinion
+			}
+		}
+	}
+}

@@ -1,0 +1,59 @@
+﻿l_english:
+  ### interactions
+  # 宗主->朝貢国 朝貢の確立
+  establish_tributary_interactions: "Establish Tributary"
+  establish_tributary_interactions_desc: "establish_tributary_interactions_desc"
+
+  # 朝貢国->宗主 朝貢国化の提案
+  become_tributary_interactions: "Become their Tributary"
+  become_tributary_interactions_desc: "become_tributary_interactions_desc"
+
+  # 宗主->朝貢国 朝貢の停止
+  cancel_tributary_from_overload_interactions: "Cancel Tributary (from overload)"
+  cancel_tributary_from_overload_interactions_desc: "cancel_tributary_from_overload_interactions_desc"
+
+  # 朝貢国->宗主 朝貢の停止
+  cancel_tributary_from_tributary_interactions: "Cancel Tributary (from Tributary)"
+  cancel_tributary_from_tributary_interactions_desc: "cancel_tributary_from_tributary_interactions_desc"
+
+  # 朝貢国->宗主国 防衛戦争の支援要求
+  call_overload_to_defensive_war_interaction: "Call Overload To Defensive War"
+  call_overload_to_defensive_war_interaction_desc: "call_overload_to_defensive_war_interaction_desc"
+  CALL_OVERLOAD_DEFENSIVE_WAR_NOTIFICATION:0 "TR As the Head of the House [actor.GetHouse.GetName], I call on you to join me in the [target.GetName]!"
+
+
+  ### Effects
+  TRUCE_TRIBUTE:0 "\nTR Truce signed in exchange for a large payment of [gold|E] from [actor.GetTitledFirstName] to [recipient.GetTitledFirstName]"
+  # establish_tributary_interaction_effect
+  establish_tributary_interaction.accept.actor.tt:0 "TR [recipient.GetTitledFirstName] has accepted my tribute"
+  establish_tributary_interaction.accept.recipient.tt:0 "TR [actor.GetTitledFirstName] sends my gold"
+
+  # purchase_truce_interaction.accept.recipient.tt:0 "[actor.GetTitledFirstName] sends my gold"
+  # purchase_truce_interaction.decline.actor.tt:0 "[recipient.GetTitledFirstName] has refused my tribute"
+  # purchase_truce_interaction.decline.recipient.tt:0 "[actor.GetTitledFirstName] fears my intentions"
+
+
+  ### Opinions
+  refused_tribute_opinion:0 "Refused Tribute"
+  broke_tributary_relation_opinion:0 "Broke our Tributary relation"
+  abandoned_tributary_relation_opinion:0 "Abandoned our Tributary relation"
+
+
+  ### Events
+  # tribute_interaction.0001
+  tribute_interaction.0010.opening:0 "TR [recipient.Custom2('AppropriateGreetingPositive', actor )]"
+  tribute_interaction.0010.desc:0 "TR [actor.GetFirstName], I think this is the beginning of a beautiful vassalship!"
+  tribute_interaction.0010.a:0 "TR My liege!"
+  tribute_interaction.0001.desc:0 "TR I accept your gracious offer of vassalization. My liege!"
+
+  # tribute_interaction.0002
+  tribute_interaction.0001.opening:1 "TR [recipient.Custom2('AppropriateGreeting', actor )]"
+  tribute_interaction.0002.desc:0 "TR I do not need your protection and prefer to keep the bounty of my Realm to myself."
+  tribute_interaction.0002.a:0 "TR I shall have to explore other options..."
+
+  # demand_tribute.0001
+  demand_tribute.0001.opening:0 "TR [actor.Custom2('AppropriateGreeting',recipient)]"
+  demand_tribute.0001.desc:0 "TR Fight #EMP you#!? Perhaps you should consider retiring to become a jester. There's not a chance in [recipient.GetFaith.NegativeAfterLife].\n\nPlease feel free to keep sending more written japes to [recipient.GetCapitalLocation.GetTitle.GetNameNoTierNoTooltip]."
+  demand_tribute.0001.a:0 "Ok"
+  demand_tribute.0001.b:0 "Refuse!"
+

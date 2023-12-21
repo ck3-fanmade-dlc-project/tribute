@@ -1,0 +1,5 @@
+﻿static_tribute_gold_barony = 5
+static_tribute_gold_county = 10
+static_tribute_gold_duchy = 30
+static_tribute_gold_kingdom = 50
+static_tribute_gold_empire = 100
