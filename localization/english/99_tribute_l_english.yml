@@ -20,13 +20,14 @@
   call_overload_to_defensive_war_interaction: "Call Overload To Defensive War"
   call_overload_to_defensive_war_interaction_desc: "call_overload_to_defensive_war_interaction_desc"
   CALL_OVERLOAD_DEFENSIVE_WAR_NOTIFICATION:0 "TR As the Head of the House [actor.GetHouse.GetName], I call on you to join me in the [target.GetName]!"
+  call_overload_to_defensive_war_interaction_same_overload:0 "We have the same overlord"
 
 
   ### Effects
-  TRUCE_TRIBUTE:0 "\nTR Truce signed in exchange for a large payment of [gold|E] from [actor.GetTitledFirstName] to [recipient.GetTitledFirstName]"
+  TRUCE_TRIBUTE:0 "\nTR Truce signed in exchange for a large payment of [gold|E] from [actor.GetTitledFirstName] to [recipient.GetTitledFirstName]"]
   # establish_tributary_interaction_effect
-  establish_tributary_interaction.accept.actor.tt:0 "TR [recipient.GetTitledFirstName] has accepted my tribute"
-  establish_tributary_interaction.accept.recipient.tt:0 "TR [actor.GetTitledFirstName] sends my gold"
+  establish_tributary_interaction.accept.actor.tt:0 "TR [overload.GetTitledFirstName] has accepted my tribute"
+  establish_tributary_interaction.accept.recipient.tt:0 "TR [tributary.GetTitledFirstName] sends my gold"
 
   # purchase_truce_interaction.accept.recipient.tt:0 "[actor.GetTitledFirstName] sends my gold"
   # purchase_truce_interaction.decline.actor.tt:0 "[recipient.GetTitledFirstName] has refused my tribute"
@@ -37,19 +38,34 @@
   refused_tribute_opinion:0 "Refused Tribute"
   broke_tributary_relation_opinion:0 "Broke our Tributary relation"
   abandoned_tributary_relation_opinion:0 "Abandoned our Tributary relation"
+  general_abandoned_tributary_relation_opinion:0 "Abandoned Tributary relation"
 
 
   ### Events
-  # tribute_interaction.0001
+  ## Establish Tributary
+  # Accepted: tribute_interaction.0001
   tribute_interaction.0010.opening:0 "TR [recipient.Custom2('AppropriateGreetingPositive', actor )]"
   tribute_interaction.0010.desc:0 "TR [actor.GetFirstName], I think this is the beginning of a beautiful vassalship!"
   tribute_interaction.0010.a:0 "TR My liege!"
   tribute_interaction.0001.desc:0 "TR I accept your gracious offer of vassalization. My liege!"
 
-  # tribute_interaction.0002
+  # Refused: tribute_interaction.0002
   tribute_interaction.0001.opening:1 "TR [recipient.Custom2('AppropriateGreeting', actor )]"
   tribute_interaction.0002.desc:0 "TR I do not need your protection and prefer to keep the bounty of my Realm to myself."
   tribute_interaction.0002.a:0 "TR I shall have to explore other options..."
+
+  ## Become Tributary
+  # Accepted: tribute_interaction.0010
+  # tribute_interaction.0010.opening:0 "TR [recipient.Custom2('AppropriateGreetingPositive', actor )]"
+  # tribute_interaction.0010.desc:0 "TR [actor.GetFirstName], I think this is the beginning of a beautiful vassalship!"
+  # tribute_interaction.0010.a:0 "TR My liege!"
+
+  # Refused: tribute_interaction.0011
+  # tribute_interaction.0001.opening:1 "[recipient.Custom2('AppropriateGreeting', actor )]"
+  tribute_interaction.0011.desc:0 "TR While I appreciate your offer of fealty, I cannot accept."
+  tribute_interaction.0011.a:0 "TR That's unfortunate."
+
+
 
   # demand_tribute.0001
   demand_tribute.0001.opening:0 "TR [actor.Custom2('AppropriateGreeting',recipient)]"
@@ -57,3 +73,13 @@
   demand_tribute.0001.a:0 "Ok"
   demand_tribute.0001.b:0 "Refuse!"
 
+  # call_overload
+  call_overload.0001.opening:0 "TR [actor.Custom2('AppropriateGreeting', ROOT.Char)]"
+  call_overload.0001.desc:0 "TR I call on you to honor our [alliance|E] and join the [target.GetName]!"
+  call_overload.0001.a:0 "To War!"
+
+  call_overload.0100.opening:0 "TR [recipient.Custom2('AppropriateGreeting', ROOT.Char)]"
+  call_overload.0100.desc:0 "TR Of course I shall join you in this war! Our foes shall learn to fear the men of [recipient.GetPrimaryTitle.GetNameNoTier]!"
+
+  call_overload.0101.desc:0 "TR Regrettably, I am in no position to get entangled in your wars."
+  call_overload.0101.a:0 "TR What a [recipient.Custom('InsultAdjective')] [recipient.Custom('InsultNoun')]!"

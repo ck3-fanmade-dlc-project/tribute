@@ -3,7 +3,7 @@
 establish_tributary_interactions = {
 	interface_priority = 30
 
-	category = interaction_category_hostile
+	category = interaction_category_diplomacy
 	common_interaction = yes
 	desc = establish_tributary_interactions_desc
 	icon = icon_dismiss_temporary_regency
@@ -18,6 +18,7 @@ establish_tributary_interactions = {
 
 	# どういうときに表示されるか
 	is_shown = {
+		NOT = { scope:actor = scope:recipient }
 		# 宗主
 		scope:actor = {
 			highest_held_title_tier > tier_duchy
@@ -70,7 +71,7 @@ establish_tributary_interactions = {
 	}
 
 	on_accept = {
-		establish_tributary_interaction_effect = yes
+		establish_tributary_interaction_effect = { OVERLOAD = scope:actor TRIBUTARY = scope:recipient }
 		scope:actor = {
 			trigger_event = tribute_interaction.0001
 		}
@@ -101,20 +102,373 @@ establish_tributary_interactions = {
 }
 
 # 朝貢国->宗主 朝貢国化の提案
+# based: offer_fealty_interaction
 become_tributary_interactions = {
 	interface_priority = 30
 
-	category = interaction_category_hostile
+	category = interaction_category_diplomacy
 	common_interaction = yes
 	desc = become_tributary_interactions_desc
 	icon = icon_dismiss_entrenched_regency
+
+	ai_targets = {
+		ai_recipients = neighboring_rulers
+	}
+	ai_target_quick_trigger = {
+		adult = yes
+	}
+	ai_frequency = 12
+
+
+	is_shown = {
+		scope:recipient = {
+			NOT = { this = scope:actor }
+		}
+		scope:actor.highest_held_title_tier < scope:recipient.highest_held_title_tier
+		scope:actor.liege = scope:actor
+		scope:recipient = {
+			liege = this
+			is_landed = yes
+		}
+	}
+
+	is_valid_showing_failures_only = {
+		scope:actor = {
+			is_imprisoned = no
+			is_at_war = no
+		}
+		scope:recipient = {
+			custom_description = {
+				text = "offer_fealty_neighboring_condition"
+				subject = scope:recipient
+				OR = {
+					any_neighboring_and_across_water_top_liege_realm_owner = { this = scope:actor }
+					any_held_title = {
+						is_de_jure_liege_or_above_target = scope:actor.capital_barony
+					}
+				}
+			}
+		}
+	}
+	greeting = positive
+	notification_text = OFFER_FEALTY_INTERACTION_NOTIFICATION
+
+	ai_min_reply_days = 5
+	ai_max_reply_days = 10
+
+	ai_accept = { # todo
+		base = 50
+		# MAIN
+		# Heretic/Infidel modifier.
+		# Tier difference modifier.
+		# Dejure modifier.
+		# Distant/Remote Realm modifier.
+
+		# MINOR
+		# Rivalry modifier.
+		# Same Dynasty modifier.
+		# Cultural/Cultural Group modifiers.
+		# Claimant modifier.
+
+		# OPINION SCALES
+		# Personality modifier.
+		# Compare Opinion modifier.
+
+		modifier = { # Different faith, no pluralism.
+			desc = offer_vassalization_interaction_aibehavior_differentfaith_tt
+			trigger = {
+				scope:actor = {
+					NOR = { # Of two different faiths AND the potential vassal's faith is not pluralistic.
+						faith = scope:recipient.faith
+						faith = { has_doctrine = doctrine_pluralism_pluralistic }
+					}
+				}
+			}
+			add = {
+				value = -25
+				if = {
+					limit = {
+						scope:actor.faith = {
+							faith_hostility_level = {
+								target = scope:recipient.faith
+								value >= faith_hostile_level
+							}
+						}
+					}
+					add = -10
+				}
+				if = {
+					limit = {
+						scope:actor.faith = {
+							faith_hostility_level = {
+								target = scope:recipient.faith
+								value >= faith_evil_level
+							}
+						}
+					}
+					add = -25
+				}
+			}
+		}
+
+		modifier = { # I am a King!
+			desc = offer_fealty_interaction_aibehavior_amkingtier_tt
+			trigger = {
+				scope:actor = { highest_held_title_tier = tier_kingdom }
+			}
+			add = -10
+		}
+		modifier = { # Wide difference in rank
+			desc = offer_vassalization_interaction_aibehavior_widetitletier_tt
+			trigger = {
+				scope:actor = {
+					tier_difference = {
+						target = scope:recipient
+						value > 1
+					}
+				}
+			}
+			add = 20
+		}
+		modifier = { # They are my Rightful Liege
+			desc = offer_vassalization_interaction_aibehavior_rightfulvassaltitleholder_tt
+			trigger = {
+				is_rightful_liege_of_trigger = {
+					VASSAL = scope:actor
+					LIEGE = scope:recipient
+				}
+			}
+			add = 25
+		}
+		modifier = { # Distant Realm.
+			desc = offer_vassalization_interaction_aibehavior_distantrealm_tt
+			trigger = {
+				scope:actor = {
+					NOT = {
+						any_neighboring_top_liege_realm_owner = { this = scope:recipient }
+					}
+				}
+				scope:actor.capital_province = { squared_distance = { target = scope:recipient.capital_province value < 200000 } }
+			}
+			add = -15
+		}
+		modifier = { # Remote Realm.
+			desc = offer_vassalization_interaction_aibehavior_remoterealm_tt
+			trigger = {
+				scope:actor = {
+					NOT = {
+						any_neighboring_top_liege_realm_owner = { this = scope:recipient }
+					}
+				}
+				scope:actor.capital_province = { squared_distance = { target = scope:recipient.capital_province value >= 200000 } }
+			}
+			add = -25
+		}
+
+		# MINOR
+		modifier = { # Rivalry modifier.
+			desc = offer_vassalization_interaction_aibehavior_rival_tt
+			trigger = {
+				scope:recipient = {
+					has_relation_rival = scope:actor
+					NOT = { has_relation_nemesis = scope:actor }
+				}
+			}
+			add = -10
+		}
+		modifier = { # Nemesis modifier.
+			desc = offer_vassalization_interaction_aibehavior_nemesis_tt
+			trigger = {
+				scope:recipient = {
+					has_relation_nemesis = scope:actor
+				}
+			}
+			add = -30
+		}
+		modifier = { # Same Dynasty modifier.
+			desc = offer_vassalization_interaction_aibehavior_dynasty_tt
+			trigger = {
+				scope:recipient = {
+					dynasty = scope:actor.dynasty
+				}
+			}
+			add = 10
+		}
+
+		modifier = { # Cultural Acceptance
+			add = -5
+			desc = cultural_acceptance_interaction_reason
+			trigger = {
+				scope:actor = {
+					NOT = { has_same_culture_as = scope:recipient }
+					culture = {
+						cultural_acceptance = { target = scope:recipient.culture value < 50 }
+					}
+				}
+			}
+		}
+
+		modifier = { # Same language
+			add = 5
+			desc = speaks_same_language_interaction_reason
+			trigger = {
+				scope:actor = {
+					knows_language_of_culture = scope:recipient.culture
+				}
+			}
+		}
+
+		modifier = { # Claimant modifier.
+			desc = offer_vassalization_interaction_aibehavior_claimant_tt
+			trigger = {
+				scope:actor.primary_title = {
+					scope:recipient = {
+						has_claim_on = prev
+					}
+				}
+			}
+			add = -15
+		}
+
+		# PERSONALITY
+		ai_value_modifier = {
+			ai_greed = 0.75
+			min = 0
+		}
+
+		# OPINION INFLUENCE
+		opinion_modifier = { # Compare Opinion modifier.
+			who = scope:recipient
+			opinion_target = scope:actor
+			multiplier = 0.5
+		}
+
+		# CONTRACT OPTIONS
+		modifier = {
+			add = {
+				value = -10
+				if = {
+					limit = { scope:recipient = { has_trait = zealous } }
+					add = -30
+				}
+				else_if = {
+					limit = { scope:recipient = { has_trait = cynical } }
+					add = 30
+				}
+			}
+			scope:actor = {	government_has_flag = government_is_feudal }
+			scope:religious_taxation = yes
+			desc = CONTRACT_RELIGIOUS_TAXATION_REASON
+		}
+		modifier = {
+			add = -40
+			scope:actor = {	government_has_flag = government_is_feudal }
+			scope:low_obligations = yes
+			desc = CONTRACT_LOW_TAXES_REASON
+		}
+		modifier = {
+			add = 40
+			scope:actor = {	government_has_flag = government_is_feudal }
+			scope:high_obligations = yes
+			desc = CONTRACT_HIGH_TAXES_REASON
+		}
+		modifier = {
+			add = {
+				value = -10
+				if = {
+					limit = { scope:recipient = { has_trait = zealous } }
+					add = -30
+				}
+				else_if = {
+					limit = { scope:recipient = { has_trait = cynical } }
+					add = 30
+				}
+			}
+			scope:actor = {	government_has_flag = government_is_clan }
+			scope:religious_exemption_clan = yes
+			desc = CONTRACT_RELIGIOUS_EXEMPTION_REASON
+		}
+	}
+
+	on_accept = {
+		offer_fealty_interaction_effect = yes
+
+		scope:actor = {
+			trigger_event = char_interaction.0010
+		}
+	}
+
+	on_decline = {
+		scope:actor = {
+			trigger_event = char_interaction.0011
+		}
+	}
+
+	ai_potential = {
+		is_adult = yes
+		is_independent_ruler = yes
+		highest_held_title_tier >= tier_county
+		highest_held_title_tier < tier_empire
+	}
+
+	# based: negotiate_alliance_interaction
+	ai_will_do = { # todo
+		base = 0
+		
+		modifier = {
+			add = 100
+			any_ally = {
+				count < 2
+			}
+			scope:recipient = { # Don't propose alliances to tiny insignificant rulers just because
+				OR = {
+					current_military_strength >= scope:actor.eighty_percent_of_current_military_strength
+					primary_title.tier >= scope:actor.primary_title.tier
+					AND = {
+						primary_title.tier >= tier_duchy
+						scope:actor.primary_title.tier < tier_empire
+					}
+				}
+			}
+		}
+		
+		modifier = { # Clans always want alliances with Vassals
+			add = 100
+			scope:actor = {
+				government_has_flag = government_is_clan
+			}
+			scope:recipient = {
+				is_vassal_of = scope:actor
+			}
+		}
+
+		# Unity modifiers
+		evaluate_action_increasing_house_unity = {
+			VALUE = 100
+		}
+		
+		modifier = { # The AI shouldn't propose to their Lieges
+			factor = 0
+			is_liege_or_above_of = scope:recipient
+		}
+		
+		modifier = { # The AI shouldn't propose to their Vassals unless Clan
+			factor = 0
+			scope:actor = {
+				NOT = { government_has_flag = government_is_clan }
+			}
+			scope:recipient = {
+				is_vassal_of = scope:actor
+			}
+		}
+	}
 }
 
 # 宗主->朝貢国 朝貢の停止
 cancel_tributary_from_overload_interactions = {
 	interface_priority = 30
 
-	category = interaction_category_hostile
+	category = interaction_category_diplomacy
 	common_interaction = yes
 	desc = cancel_tributary_from_overload_interactions_desc
 	icon = independence
@@ -124,12 +478,13 @@ cancel_tributary_from_overload_interactions = {
 cancel_tributary_from_tributary_interactions = {
 	interface_priority = 30
 
-	category = interaction_category_hostile
+	category = interaction_category_diplomacy
 	common_interaction = yes
 	desc = cancel_tributary_from_tributary_interactions_desc
 	icon = independence
 }
 
+# 朝貢国->宗主国 防衛戦争への呼び出し
 call_overload_to_defensive_war_interaction = {
 	category = interaction_category_diplomacy
 	icon = alliance
@@ -153,19 +508,10 @@ call_overload_to_defensive_war_interaction = {
 				primary_defender = scope:actor
 			}
 		}
-		scope:actor = { has_variable = is_tributary }
-		scope:actor = { has_variable = overload }
-		scope:actor = { var:overload = scope:recipient }
 
-		scope:recipient = { is_landed = yes }
-		scope:recipient = {
-			is_target_in_variable_list = {
-				name = tributaries
-				target = scope:actor
-			}
-		}
-
+		is_valid_tributary_relation_trigger = { OVERLOAD = scope:recipient TRIBUTARY = scope:actor }
 	}
+	ai_maybe = yes
 	
 	has_valid_target = {
 		exists = scope:target
@@ -182,7 +528,6 @@ call_overload_to_defensive_war_interaction = {
 	}
 
 	is_valid_showing_failures_only = {
-		# 同じ宗主の朝貢国であれば呼べない
 		custom_description = {
 			text = "is_already_in_all_wars"
 			scope:actor = {
@@ -202,20 +547,29 @@ call_overload_to_defensive_war_interaction = {
 
 	can_be_picked = {
 		can_join_war_liege_vassal_check_trigger = { WARRIOR = scope:actor JOINER = scope:recipient }
+		# 同じ宗主の朝貢国であれば呼べない
+		custom_tooltip = {
+			text = call_overload_to_defensive_war_interaction_same_overload
+			trigger_if = {
+				limit = { scope:target.casus_belli.primary_attacker = { has_variable = is_tributary } }
+				NOT = { is_valid_tributary_relation_trigger = { OVERLOAD = scope:recipient TRIBUTARY = scope:target.casus_belli.primary_attacker } }
+			}
+		}
 	}
 
 	on_auto_accept = {
 		scope:recipient = {
-			trigger_event = call_ally.0001
+			trigger_event = call_overload.0001
 		}
 	}
 	
 	on_accept = {
-		call_house_member_to_war_interaction_effect = yes
-
-		save_scope_value_as = {
-			name = call_house_member_to_war_interaction
-			value = yes
+		call_overload_interaction_effect = yes
+		if = {
+			limit = { always = scope:hook }
+			scope:actor = {
+				use_hook = scope:recipient
+			}
 		}
 
 		if = {
@@ -224,21 +578,8 @@ call_overload_to_defensive_war_interaction = {
 			}
 
 			scope:actor = {
-				trigger_event = call_ally.0100
+				trigger_event = call_overload.0100
 			}
-		}
-
-		scope:actor = {
-			if = {
-				limit = { NOT = {  is_house_head = yes } }
-				add_prestige = medium_prestige_loss
-			}
-		}
-
-		# If the Dynasty has the Unity Legacy perk, the recipient is rewarded with some Prestige
-		if = {
-			limit = { scope:actor.dynasty = { has_dynasty_perk = fp2_coterie_legacy_3 } }
-			scope:recipient = {	add_prestige = medium_prestige_gain	}
 		}
 	}
 	
@@ -249,28 +590,27 @@ call_overload_to_defensive_war_interaction = {
 				exists = scope:target
 			}
 
+			# 朝貢国を見捨てた!
 			scope:target = {
-				if = {
-					limit = {
-						is_attacker = scope:actor
-					}
-					scope:actor = {
-						add_opinion = {
-							modifier = rejected_call_to_offensive_war
-							target = scope:recipient
-						}
-					}
-				}
-				else = {
-					scope:actor = {
-						add_opinion = {
-							modifier = rejected_call_to_defensive_war
-							target = scope:recipient
-						}
-					}
-				}
 				scope:actor = {
-					trigger_event = call_ally.0101
+					add_opinion = {
+						modifier = abandoned_tributary_relation_opinion
+						target = scope:recipient
+					}
+				}
+				scope:recipient = {
+					every_in_list = {
+						variable = tributaries
+						limit = { NOT = { this = scope:actor } }
+						add_opinion = {
+							modifier = general_abandoned_tributary_relation_opinion
+							target = scope:recipient
+						}
+					}
+				}
+
+				scope:actor = {
+					trigger_event = call_overload.0101
 				}
 			}
 
@@ -419,13 +759,84 @@ call_overload_to_defensive_war_interaction = {
 			desc = WONT_ATTACK_RELIGIOUS_BRETHREN_REASON
 		}
 
-		modifier = { # Happy to gain Prestige thanks to the Unity perk
-			add = 50
-			dynasty = { has_dynasty_perk = fp2_coterie_legacy_3 }
-			desc = "UNITY_PERK_BONUS"
+		# 独自
+		# 最近朝貢を断ったか?
+		modifier = {
+			add = -50
+			has_opinion_modifier = {
+				modifier = refused_tribute_opinion
+				target = scope:actor
+			}
 		}
 
-		fp3_struggle_resist_allied_wars_modifier = yes
+		# fp3_struggle_resist_allied_wars_modifier = yes
+	}
+
+	# call_ally_interactionのコピペ
+	ai_will_do = {
+		base = 100
+		
+		modifier = { # If the player is at war, do not bother them with offensive calls
+			scope:target.casus_belli.primary_attacker = scope:actor
+			scope:recipient = {
+				is_ai = no
+				any_character_war = {
+					primary_defender = scope:recipient
+				}
+			}
+			factor = 0
+		}
+		
+		modifier = { # Don't call players in against their heirs (they wouldn't accept the reverse situation... don't be a hypocrite)
+			exists = scope:recipient.player_heir
+			scope:recipient = {			
+				is_ai = no
+			}
+			trigger_if = {
+				limit = { scope:target.casus_belli.primary_defender = scope:actor }
+				scope:target.casus_belli.primary_attacker = scope:recipient.player_heir
+			}
+			trigger_else = {
+				scope:target.casus_belli.primary_defender = scope:recipient.player_heir
+			}
+			factor = 0
+		}
+		
+		modifier = { # Same with spouses
+			scope:recipient = {			
+				is_ai = no
+			}
+			trigger_if = {
+				limit = { scope:target.casus_belli.primary_defender = scope:actor }
+				any_spouse = {
+					this = scope:target.casus_belli.primary_attacker
+				}
+			}
+			trigger_else = {
+				any_spouse = {
+					this = scope:target.casus_belli.primary_defender
+				}
+			}
+			factor = 0
+		}
+		
+		modifier = { # Don't call brand-new allies into old wars, at least until some time has elapsed.
+			has_variable = delay_calling_recent_ally
+			var:delay_calling_recent_ally = scope:recipient
+			scope:target = {
+				war_days >= 30
+			}
+			factor = 0
+
+		}
+
+		modifier = { # If the recipient is allied to both the attacker and the defender, the attacker shouldn't call
+			scope:target.casus_belli.primary_attacker = scope:actor
+			scope:target.casus_belli.primary_defender = {
+				is_allied_to = scope:recipient
+			}
+			factor = 0
+		}
 	}
 
 	auto_accept = {

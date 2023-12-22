@@ -1,0 +1,25 @@
+﻿# 朝貢国側からチェック
+# OVERLOAD: 宗主国とされるキャラクター
+# TRIBUTARY: 朝貢国とされるキャラクター
+is_valid_tributary_relation_trigger = {
+	$OVERLOAD$ = {
+		AND = {
+			has_variable_list = tributaries
+			is_target_in_variable_list = {
+				name = tributaries
+				target = $TRIBUTARY$
+			}
+		}
+	}
+
+	$TRIBUTARY$ = {
+		AND = {
+			has_variable = is_tributary
+			var:is_tributary = yes
+
+			has_variable = overload
+			var:overload = $OVERLOAD$
+		}
+	}
+}
+

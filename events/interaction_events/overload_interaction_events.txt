@@ -1,0 +1,87 @@
+﻿namespace = call_overload
+# based: call_ally
+
+# Notification that you have been automatically called
+call_overload.0001 = {
+	type = letter_event
+	opening = {
+		desc = call_overload.0001.opening
+	}
+	desc = call_overload.0001.desc
+	sender = scope:actor
+
+	option = {
+		name = call_overload.0001.a
+		play_music_cue = mx_cue_combat_stinger
+	}
+}
+
+# Call to War Response: Accepted
+call_overload.0100 = {
+	type = letter_event
+	opening = {
+		desc = call_overload.0100.opening
+	}
+	desc = call_overload.0100.desc
+	sender = {
+		character = scope:recipient
+		animation = anger
+	}
+
+	immediate = {
+		#What tooltip to we want to show?
+		show_as_tooltip = {
+			scope:actor = {
+				if = {
+					limit = {
+						scope:recipient.primary_title.tier = tier_county
+					}
+					add_prestige = miniscule_prestige_loss
+				}
+				else_if = {
+					limit = {
+						scope:recipient.primary_title.tier = tier_duchy
+					}
+					add_prestige = minor_prestige_loss
+				}
+				else_if = {
+					limit = {
+						scope:recipient.primary_title.tier = tier_kingdom
+					}
+					add_prestige = medium_prestige_loss
+				}
+				else = {
+					add_prestige = major_prestige_loss
+				}
+			}
+		}
+	}
+
+	option = {
+		name = EXCELLENT
+	}
+}
+
+# Call to War Response: Refused
+call_overload.0101 = {
+	type = letter_event
+	opening = {
+		desc = call_overload.0100.opening
+	}
+	desc = call_overload.0101.desc
+	sender = {
+		character = scope:recipient
+		animation = dismissal
+	}
+
+	immediate = {
+		show_as_tooltip = {			
+			# If we're a clan this interaction affects unity - Let's show that in the tooltip
+			refuse_call_to_arms_add_clan_unity_effect = yes
+		}
+	}
+
+	option = {
+		name = call_overload.0101.a
+	}
+}

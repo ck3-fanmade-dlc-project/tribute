@@ -18,3 +18,10 @@ abandoned_tributary_relation_opinion = {
 	decaying = yes
 	stacking = yes
 }
+
+general_abandoned_tributary_relation_opinion = {
+	opinion = -20
+	monthly_change = 0.15
+	decaying = yes
+	stacking = yes
+}

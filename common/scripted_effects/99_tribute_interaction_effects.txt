@@ -7,63 +7,192 @@
 }
 
 # based: purchase_truce_interaction
+# establish_tributary_interaction_effect = {
+# 	scope:actor = { save_scope_as = overload } # 宗主
+# 	scope:recipient = { save_scope_as = tributary } # 朝貢国
+	
+# 	# 停戦処理
+# 	# Notifications with most effects.
+# 	scope:actor = {
+# 		send_interface_toast = {
+# 			title = establish_tributary_interaction.accept.actor.tt
+# 			left_icon = scope:recipient
+# 			show_as_tooltip = {
+# 				establish_tributary_interaction_work_out_truce_days_effect = { TARGET = scope:recipient }
+# 			}
+# 		}
+# 		# Outside of the notification, since we'll send a separate one anyway, we want to point out the catalyst activation (if relevant).
+# 	}
+# 	scope:recipient = {
+# 		send_interface_toast = {
+# 			title = establish_tributary_interaction.accept.recipient.tt
+# 			left_icon = scope:actor
+# 			show_as_tooltip = {
+# 				establish_tributary_interaction_work_out_truce_days_effect = { TARGET = scope:actor }
+# 			}
+# 		}
+# 	}
+# 	# Then we apply the actual truce.
+# 	hidden_effect = {
+# 		scope:actor = {
+# 			establish_tributary_interaction_work_out_truce_days_effect = { TARGET = scope:recipient }
+# 		}
+# 	}
+
+# 	# 宗主国の朝貢国リストに追加
+# 	scope:actor = {
+# 		add_to_variable_list = {
+# 			name = tributaries
+# 			target = scope:recipient
+# 		}
+# 	}
+
+# 	# 朝貢国として情報をつける
+# 	scope:recipient = {
+# 		set_variable = {
+# 			name = is_tributary
+# 			value = yes
+# 		}
+# 		set_variable = {
+# 			name = overload
+# 			value = scope:overload
+# 		}
+# 	}
+
+# 	# 1年後に朝貢要求
+# 	scope:recipient = {
+# 		trigger_event = {
+# 			id = demand_tribute.0001
+# 			days = 364
+# 		}
+# 	}
+# }
+
 establish_tributary_interaction_effect = {
-	scope:actor = { save_scope_as = overload } # 宗主
-	scope:recipient = { save_scope_as = tributary } # 朝貢国
+	$OVERLOAD$ = { save_scope_as = overload } # 宗主
+	$TRIBUTARY$ = { save_scope_as = tributary } # 朝貢国
 	
 	# 停戦処理
 	# Notifications with most effects.
-	scope:actor = {
+	$OVERLOAD$ = {
 		send_interface_toast = {
 			title = establish_tributary_interaction.accept.actor.tt
-			left_icon = scope:recipient
+			left_icon = $TRIBUTARY$
 			show_as_tooltip = {
-				establish_tributary_interaction_work_out_truce_days_effect = { TARGET = scope:recipient }
+				establish_tributary_interaction_work_out_truce_days_effect = { TARGET = $TRIBUTARY$ }
 			}
 		}
 		# Outside of the notification, since we'll send a separate one anyway, we want to point out the catalyst activation (if relevant).
 	}
-	scope:recipient = {
+	$TRIBUTARY$ = {
 		send_interface_toast = {
 			title = establish_tributary_interaction.accept.recipient.tt
-			left_icon = scope:actor
+			left_icon = $OVERLOAD$
 			show_as_tooltip = {
-				establish_tributary_interaction_work_out_truce_days_effect = { TARGET = scope:actor }
+				establish_tributary_interaction_work_out_truce_days_effect = { TARGET = $OVERLOAD$ }
 			}
 		}
 	}
 	# Then we apply the actual truce.
 	hidden_effect = {
-		scope:actor = {
-			establish_tributary_interaction_work_out_truce_days_effect = { TARGET = scope:recipient }
+		$OVERLOAD$ = {
+			establish_tributary_interaction_work_out_truce_days_effect = { TARGET = $TRIBUTARY$ }
 		}
 	}
 
 	# 宗主国の朝貢国リストに追加
-	scope:actor = {
+	$OVERLOAD$ = {
 		add_to_variable_list = {
 			name = tributaries
-			target = scope:recipient
+			target = $TRIBUTARY$
 		}
 	}
 
 	# 朝貢国として情報をつける
-	scope:recipient = {
+	$TRIBUTARY$ = {
 		set_variable = {
 			name = is_tributary
 			value = yes
 		}
 		set_variable = {
 			name = overload
-			value = scope:overload
+			value = $OVERLOAD$
 		}
 	}
 
 	# 1年後に朝貢要求
-	scope:recipient = {
+	$TRIBUTARY$ = {
 		trigger_event = {
 			id = demand_tribute.0001
 			days = 364
+		}
+	}
+}
+
+# based: call_ally_interaction_effect
+call_overload_interaction_effect = {
+	if = {
+		limit = {
+			exists = scope:target
+			scope:recipient = {
+				NOR = {
+					is_at_war_with = scope:target.primary_defender
+					is_at_war_with = scope:target.primary_attacker
+				}
+			}
+		}
+		call_overload_interaction_event_effect = yes
+
+	}
+}
+
+#based: call_ally_interaction_event_effect
+#So that we can show a tooltip in the event about them responding
+call_overload_interaction_event_effect = {
+	scope:target = {
+		hidden_effect = {
+			set_called_to = scope:recipient
+		}
+		if = {
+			limit = {
+				is_attacker = scope:actor
+			}
+			add_attacker = scope:recipient
+			scope:actor = {
+				if = {
+					limit = {
+						scope:recipient.primary_title.tier = tier_barony
+					}
+					add_prestige = -10
+				}
+				else_if = {
+					limit = {
+						scope:recipient.primary_title.tier = tier_county
+					}
+					add_prestige = minor_prestige_loss
+				}
+				else_if = {
+					limit = {
+						scope:recipient.primary_title.tier = tier_duchy
+					}
+					add_prestige = medium_prestige_loss
+				}
+				else_if = {
+					limit = {
+						scope:recipient.primary_title.tier = tier_kingdom
+					}
+					add_prestige = major_prestige_loss
+				}
+				else_if = {
+					limit = {
+						scope:recipient.primary_title.tier = tier_empire
+					}
+					add_prestige = massive_prestige_loss
+				}
+			}
+		}
+		else = {
+			add_defender = scope:recipient
 		}
 	}
 }
