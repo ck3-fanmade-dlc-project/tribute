@@ -80,3 +80,62 @@ tribute_interaction.0011 = {
 		name = tribute_interaction.0011.a
 	}
 }
+
+# # We were fired from the council by our liege!
+# council_interaction.0021 = {
+# 	type = letter_event
+# 	opening = council_interaction.0000.opening
+# 	desc = council_interaction.0021.desc
+# 	sender = {
+# 		character = scope:council_owner
+# 		animation = dismissal
+# 	}
+
+# 	option = {
+# 		name = council_interaction.0021.a
+# 	}
+# }
+
+# Cancel Tributary (from overload)
+tribute_interaction.0021 = {
+	type = letter_event
+	opening = tribute_interaction.0021.opening
+	desc = tribute_interaction.0021.desc
+	sender = {
+		character = scope:actor
+		animation = dismissal
+	}
+
+	option = {
+		name = tribute_interaction.0021.a
+		scope:recipient = {
+			add_opinion = {
+				modifier = broke_tributary_relation_opinion
+				target = scope:actor
+			}
+		}
+		broke_tributary_relation_effect = { OVERLOAD = scope:actor TRIBUTARY = scope:recipient }
+	}
+}
+
+# Cancel Tributary (from tribuatry)
+tribute_interaction.0022 = {
+	type = letter_event
+	opening = tribute_interaction.0022.opening
+	desc = tribute_interaction.0022.desc
+	sender = {
+		character = scope:actor
+		animation = dismissal
+	}
+
+	option = {
+		name = tribute_interaction.0022.a
+		scope:recipient = {
+			add_opinion = {
+				modifier = broke_tributary_relation_opinion
+				target = scope:actor
+			}
+		}
+		broke_tributary_relation_effect = { OVERLOAD = scope:recipient TRIBUTARY = scope:actor }
+	}
+}

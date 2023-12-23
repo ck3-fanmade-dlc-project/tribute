@@ -7,67 +7,6 @@
 }
 
 # based: purchase_truce_interaction
-# establish_tributary_interaction_effect = {
-# 	scope:actor = { save_scope_as = overload } # 宗主
-# 	scope:recipient = { save_scope_as = tributary } # 朝貢国
-	
-# 	# 停戦処理
-# 	# Notifications with most effects.
-# 	scope:actor = {
-# 		send_interface_toast = {
-# 			title = establish_tributary_interaction.accept.actor.tt
-# 			left_icon = scope:recipient
-# 			show_as_tooltip = {
-# 				establish_tributary_interaction_work_out_truce_days_effect = { TARGET = scope:recipient }
-# 			}
-# 		}
-# 		# Outside of the notification, since we'll send a separate one anyway, we want to point out the catalyst activation (if relevant).
-# 	}
-# 	scope:recipient = {
-# 		send_interface_toast = {
-# 			title = establish_tributary_interaction.accept.recipient.tt
-# 			left_icon = scope:actor
-# 			show_as_tooltip = {
-# 				establish_tributary_interaction_work_out_truce_days_effect = { TARGET = scope:actor }
-# 			}
-# 		}
-# 	}
-# 	# Then we apply the actual truce.
-# 	hidden_effect = {
-# 		scope:actor = {
-# 			establish_tributary_interaction_work_out_truce_days_effect = { TARGET = scope:recipient }
-# 		}
-# 	}
-
-# 	# 宗主国の朝貢国リストに追加
-# 	scope:actor = {
-# 		add_to_variable_list = {
-# 			name = tributaries
-# 			target = scope:recipient
-# 		}
-# 	}
-
-# 	# 朝貢国として情報をつける
-# 	scope:recipient = {
-# 		set_variable = {
-# 			name = is_tributary
-# 			value = yes
-# 		}
-# 		set_variable = {
-# 			name = overload
-# 			value = scope:overload
-# 		}
-# 	}
-
-# 	# 1年後に朝貢要求
-# 	scope:recipient = {
-# 		trigger_event = {
-# 			id = demand_tribute.0001
-# 			days = 364
-# 		}
-# 	}
-# }
-
 establish_tributary_interaction_effect = {
 	$OVERLOAD$ = { save_scope_as = overload } # 宗主
 	$TRIBUTARY$ = { save_scope_as = tributary } # 朝貢国
@@ -125,6 +64,26 @@ establish_tributary_interaction_effect = {
 		trigger_event = {
 			id = demand_tribute.0001
 			days = 364
+		}
+	}
+}
+
+broke_tributary_relation_effect = {
+	# OVERLOAD
+	# TRIBUTARY
+	if = {
+		limit = {
+			is_valid_tributary_relation_trigger = { OVERLOAD = $OVERLOAD$ TRIBUTARY = $TRIBUTARY$ }
+		}
+		$OVERLOAD$ = {
+			remove_list_variable = {
+				name = tributaries
+				target = $TRIBUTARY$
+			}
+		}
+		$TRIBUTARY$ = {
+			remove_variable = is_tributary
+			remove_variable = overload
 		}
 	}
 }

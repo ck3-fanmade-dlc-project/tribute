@@ -22,9 +22,18 @@
   CALL_OVERLOAD_DEFENSIVE_WAR_NOTIFICATION:0 "TR As the Head of the House [actor.GetHouse.GetName], I call on you to join me in the [target.GetName]!"
   call_overload_to_defensive_war_interaction_same_overload:0 "We have the same overlord"
 
+  # 既に朝貢関係である
+  we_have_tributary_relation: "We have already Tributary Relation"
+  # これは他国の朝貢国である
+  this_is_tributary_state_of_other_county: "This is tributary state of other country"
+  # すでに他の朝貢関係を持っている
+  i_have_already_other_tributary_relation: "I have already other Tributary Relation"
+  # 朝貢関係がない
+  we_do_not_have_tributary_relation: "We do not have Tributary Relation"
+
 
   ### Effects
-  TRUCE_TRIBUTE:0 "\nTR Truce signed in exchange for a large payment of [gold|E] from [actor.GetTitledFirstName] to [recipient.GetTitledFirstName]"]
+  TRUCE_TRIBUTE:0 "\nTR Truce signed in exchange for a large payment of [gold|E] from [actor.GetTitledFirstName] to [recipient.GetTitledFirstName]"
   # establish_tributary_interaction_effect
   establish_tributary_interaction.accept.actor.tt:0 "TR [overload.GetTitledFirstName] has accepted my tribute"
   establish_tributary_interaction.accept.recipient.tt:0 "TR [tributary.GetTitledFirstName] sends my gold"
@@ -65,6 +74,17 @@
   tribute_interaction.0011.desc:0 "TR While I appreciate your offer of fealty, I cannot accept."
   tribute_interaction.0011.a:0 "TR That's unfortunate."
 
+  ## Cancel Tributary from overload
+  # tribute_interaction.0021
+  tribute_interaction.0021.opening:0 "TR [actor.Custom2('AppropriateGreetingPositive', recipient )]"
+  tribute_interaction.0021.desc:0 "TR BROKE TRIBUTAY RELATION from overload"
+  tribute_interaction.0021.a:0 "TR That's unfortunate."
+
+  ## Cancel Tributary from tributary
+  # tribute_interaction.0022
+  tribute_interaction.0022.opening:0 "TR [actor.Custom2('AppropriateGreetingPositive', recipient )]"
+  tribute_interaction.0022.desc:0 "TR BROKE TRIBUTAY RELATION from tributary"
+  tribute_interaction.0022.a:0 "TR That's unfortunate."
 
 
   # demand_tribute.0001

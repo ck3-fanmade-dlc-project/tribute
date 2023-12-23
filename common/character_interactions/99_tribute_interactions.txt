@@ -3,7 +3,7 @@
 establish_tributary_interactions = {
 	interface_priority = 30
 
-	category = interaction_category_diplomacy
+	category = interaction_category_vassal
 	common_interaction = yes
 	desc = establish_tributary_interactions_desc
 	icon = icon_dismiss_temporary_regency
@@ -39,10 +39,17 @@ establish_tributary_interactions = {
 		}
 	}
 
-	# どういうときに使用不可になるか
+	# どういうときに使用可能になるか
 	is_valid_showing_failures_only = {
-		scope:recipient = {
-			NOT = { has_variable = is_tributary }
+		# 他国の朝貢国でないとき
+		custom_tooltip = {
+			text = this_is_tributary_state_of_other_county
+			NOT = { have_other_tributary_relation_trigger = { OVERLOAD = scope:actor TRIBUTARY = scope:recipient } }
+		}
+		# 既に自分の朝貢国でないとき
+		custom_tooltip = {
+			text = we_have_tributary_relation
+			NOT = { is_valid_tributary_relation_trigger = { OVERLOAD = scope:actor TRIBUTARY = scope:recipient } }
 		}
 
 		scope:recipient = {
@@ -106,7 +113,7 @@ establish_tributary_interactions = {
 become_tributary_interactions = {
 	interface_priority = 30
 
-	category = interaction_category_diplomacy
+	category = interaction_category_vassal
 	common_interaction = yes
 	desc = become_tributary_interactions_desc
 	icon = icon_dismiss_entrenched_regency
@@ -121,9 +128,7 @@ become_tributary_interactions = {
 
 
 	is_shown = {
-		scope:recipient = {
-			NOT = { this = scope:actor }
-		}
+		NOT = { scope:actor = scope:recipient }
 		scope:actor.highest_held_title_tier < scope:recipient.highest_held_title_tier
 		scope:actor.liege = scope:actor
 		scope:recipient = {
@@ -133,6 +138,17 @@ become_tributary_interactions = {
 	}
 
 	is_valid_showing_failures_only = {
+		# 既にこの国の朝貢国である場合
+		custom_tooltip = {
+			text = we_have_tributary_relation
+			NOT = { is_valid_tributary_relation_trigger = { OVERLOAD = scope:recipient TRIBUTARY = scope:actor } }
+		}
+		# 既に他の国の朝貢国である場合
+		custom_tooltip = {
+			text = i_have_already_other_tributary_relation
+			NOT = { have_other_tributary_relation_trigger = { OVERLOAD = scope:recipient TRIBUTARY = scope:actor } }
+		}
+
 		scope:actor = {
 			is_imprisoned = no
 			is_at_war = no
@@ -342,65 +358,20 @@ become_tributary_interactions = {
 			opinion_target = scope:actor
 			multiplier = 0.5
 		}
-
-		# CONTRACT OPTIONS
-		modifier = {
-			add = {
-				value = -10
-				if = {
-					limit = { scope:recipient = { has_trait = zealous } }
-					add = -30
-				}
-				else_if = {
-					limit = { scope:recipient = { has_trait = cynical } }
-					add = 30
-				}
-			}
-			scope:actor = {	government_has_flag = government_is_feudal }
-			scope:religious_taxation = yes
-			desc = CONTRACT_RELIGIOUS_TAXATION_REASON
-		}
-		modifier = {
-			add = -40
-			scope:actor = {	government_has_flag = government_is_feudal }
-			scope:low_obligations = yes
-			desc = CONTRACT_LOW_TAXES_REASON
-		}
-		modifier = {
-			add = 40
-			scope:actor = {	government_has_flag = government_is_feudal }
-			scope:high_obligations = yes
-			desc = CONTRACT_HIGH_TAXES_REASON
-		}
-		modifier = {
-			add = {
-				value = -10
-				if = {
-					limit = { scope:recipient = { has_trait = zealous } }
-					add = -30
-				}
-				else_if = {
-					limit = { scope:recipient = { has_trait = cynical } }
-					add = 30
-				}
-			}
-			scope:actor = {	government_has_flag = government_is_clan }
-			scope:religious_exemption_clan = yes
-			desc = CONTRACT_RELIGIOUS_EXEMPTION_REASON
-		}
 	}
 
 	on_accept = {
-		offer_fealty_interaction_effect = yes
+		# offer_fealty_interaction_effect = yes
+		establish_tributary_interaction_effect = { OVERLOAD = scope:recipient TRIBUTARY = scope:actor }
 
 		scope:actor = {
-			trigger_event = char_interaction.0010
+			trigger_event = tribute_interaction.0010
 		}
 	}
 
 	on_decline = {
 		scope:actor = {
-			trigger_event = char_interaction.0011
+			trigger_event = tribute_interaction.0011
 		}
 	}
 
@@ -468,20 +439,77 @@ become_tributary_interactions = {
 cancel_tributary_from_overload_interactions = {
 	interface_priority = 30
 
-	category = interaction_category_diplomacy
+	category = interaction_category_vassal
 	common_interaction = yes
 	desc = cancel_tributary_from_overload_interactions_desc
 	icon = independence
+
+	
+	ai_target_quick_trigger = {
+		adult = yes
+	}
+	# ai_frequency = 12
+	# ai_targets = {
+	# 	ai_recipients = neighboring_rulers
+	# 	ai_recipients = scripted_relations
+	# }
+
+	is_shown = {
+		NOT = { scope:actor = scope:recipient }
+		is_valid_tributary_relation_trigger = { OVERLOAD = scope:actor TRIBUTARY = scope:recipient }
+	}
+
+	auto_accept = yes
+	on_auto_accept = {
+		scope:recipient = {
+			trigger_event = {
+				id = tribute_interaction.0021
+				days = 1
+			}
+		}
+	}
+
+	ai_will_do = {
+		base = 100
+	}
 }
 
 # 朝貢国->宗主 朝貢の停止
 cancel_tributary_from_tributary_interactions = {
 	interface_priority = 30
 
-	category = interaction_category_diplomacy
+	category = interaction_category_vassal
 	common_interaction = yes
 	desc = cancel_tributary_from_tributary_interactions_desc
 	icon = independence
+
+	ai_target_quick_trigger = {
+		adult = yes
+	}
+	# ai_frequency = 12
+	# ai_targets = {
+	# 	ai_recipients = neighboring_rulers
+	# 	ai_recipients = scripted_relations
+	# }
+
+	is_shown = {
+		NOT = { scope:actor = scope:recipient }
+		is_valid_tributary_relation_trigger = { OVERLOAD = scope:recipient TRIBUTARY = scope:actor }
+	}
+
+	auto_accept = yes
+	on_auto_accept = {
+		scope:recipient = {
+			trigger_event = {
+				id = tribute_interaction.0022
+				days = 1
+			}
+		}
+	}
+
+	ai_will_do = {
+		base = 100
+	}
 }
 
 # 朝貢国->宗主国 防衛戦争への呼び出し
@@ -528,7 +556,7 @@ call_overload_to_defensive_war_interaction = {
 	}
 
 	is_valid_showing_failures_only = {
-		custom_description = {
+		custom_tooltip = {
 			text = "is_already_in_all_wars"
 			scope:actor = {
 				any_character_war = {
