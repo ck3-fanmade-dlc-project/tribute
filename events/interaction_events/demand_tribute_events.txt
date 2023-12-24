@@ -39,7 +39,7 @@ demand_tribute.0001 = {
 			scope:tributary = {
 				trigger_event = {
 					id = demand_tribute.0001
-					days = 30
+					days = 365
 				}
 			}
 		}
