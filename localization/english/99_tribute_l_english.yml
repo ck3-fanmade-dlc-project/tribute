@@ -30,6 +30,13 @@
   i_have_already_other_tributary_relation: "I have already other Tributary Relation"
   # 朝貢関係がない
   we_do_not_have_tributary_relation: "We do not have Tributary Relation"
+  # 私は宗主国である
+  i_am_overload: "I am Overload State"
+  # 私は朝貢国である
+  i_am_tributary: "I am Tributary State"
+
+  # あなたの君主と朝貢関係にある
+  this_state_has_tributary_relationship_with_your_liege: "This State has a tributary relationship with your Liege"
 
 
   ### Effects
@@ -92,6 +99,17 @@
   demand_tribute.0001.desc:0 "TR Fight #EMP you#!? Perhaps you should consider retiring to become a jester. There's not a chance in [recipient.GetFaith.NegativeAfterLife].\n\nPlease feel free to keep sending more written japes to [recipient.GetCapitalLocation.GetTitle.GetNameNoTierNoTooltip]."
   demand_tribute.0001.a:0 "Ok"
   demand_tribute.0001.b:0 "Refuse!"
+
+  # 朝貢したよ
+  demand_tribute.0002.opening:0 "TR [actor.Custom2('AppropriateGreeting',recipient)]"
+  demand_tribute.0002.desc:0 "TR I paid tribute."
+  demand_tribute.0002.a:0 "Ok"
+
+  # 朝貢しなかったよ
+  demand_tribute.0003.opening:0 "TR [actor.Custom2('AppropriateGreeting',recipient)]"
+  demand_tribute.0003.desc:0 "TR I refused to pay tribute."
+  demand_tribute.0003.a:0 "I hate you"
+
 
   # call_overload
   call_overload.0001.opening:0 "TR [actor.Custom2('AppropriateGreeting', ROOT.Char)]"

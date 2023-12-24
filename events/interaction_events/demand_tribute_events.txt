@@ -8,20 +8,7 @@ demand_tribute.0001 = {
 	desc = demand_tribute.0001.desc
 
 	trigger = {
-		is_landed = yes
-
-		AND = {
-			scope:tributary = { has_variable = is_tributary }
-			scope:tributary = { has_variable = overload }
-			scope:tributary = { var:overload = scope:overload }
-
-			scope:overload = {
-				is_target_in_variable_list = {
-					name = tributaries
-					target = scope:tributary
-				}
-			}
-		}
+		is_valid_tributary_relation_trigger = { OVERLOAD = scope:overload TRIBUTARY = scope:tributary }
 	}
 
 	on_trigger_fail = {
@@ -37,18 +24,23 @@ demand_tribute.0001 = {
 	}
 
 	after = {
-		# 停戦追加
-		scope:overload = {
-			add_truce_both_ways = {
-				character = scope:tributary
-				days = 365
-				name = TRUCE_TRIBUTE
+		if = {
+			limit = {
+				is_valid_tributary_relation_trigger = { OVERLOAD = scope:overload TRIBUTARY = scope:tributary }
 			}
-		}
-		scope:recipient = {
-			trigger_event = {
-				id = demand_tribute.0001
-				days = 364
+			# 停戦追加
+			scope:overload = {
+				add_truce_both_ways = {
+					character = scope:tributary
+					days = 365
+					name = TRUCE_TRIBUTE
+				}
+			}
+			scope:tributary = {
+				trigger_event = {
+					id = demand_tribute.0001
+					days = 30
+				}
 			}
 		}
 	}
@@ -90,13 +82,6 @@ demand_tribute.0001 = {
 					}
 				}
 				else_if = {
-					limit = { highest_held_title_tier = tier_barony }
-					pay_short_term_gold = {
-						target = scope:overload
-						gold = { value = static_tribute_gold_barony }
-					}
-				}
-				else_if = {
 					limit = { highest_held_title_tier = tier_duchy }
 					pay_short_term_gold = {
 						target = scope:overload
@@ -119,12 +104,41 @@ demand_tribute.0001 = {
 				}
 			}
 		}
+
+		scope:overload = {
+			trigger_event = demand_tribute.0002
+		}
 	}
 
 	# Refuse. I will not pay
 	option = {
 		name = demand_tribute.0001.b
 		
+		scope:overload = {
+			trigger_event = demand_tribute.0003
+		}
+	}
+}
+
+# 朝貢国->宗主 支払ったよ通知
+demand_tribute.0002 = {
+	type = letter_event
+	sender = scope:tributary
+
+	opening = demand_tribute.0002.opening
+	desc = demand_tribute.0002.desc
+	option = { name = demand_tribute.0002.a }
+}
+
+# 朝貢国->宗主 支払いは拒否するよ通知
+demand_tribute.0003 = {
+	type = letter_event
+	sender = scope:tributary
+
+	opening = demand_tribute.0003.opening
+	desc = demand_tribute.0003.desc
+	option = {
+		name = demand_tribute.0003.a
 		scope:overload = {
 			add_opinion = {
 				target = scope:tributary

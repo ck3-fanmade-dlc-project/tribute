@@ -4,6 +4,8 @@
 is_valid_tributary_relation_trigger = {
 	$OVERLOAD$ = {
 		AND = {
+			is_independent_ruler = yes
+
 			has_variable_list = tributaries
 			is_target_in_variable_list = {
 				name = tributaries
@@ -14,9 +16,10 @@ is_valid_tributary_relation_trigger = {
 
 	$TRIBUTARY$ = {
 		AND = {
+			is_independent_ruler = yes
+
 			has_variable = is_tributary
 			var:is_tributary = yes
-
 			has_variable = overload
 			var:overload = $OVERLOAD$
 		}
@@ -36,3 +39,18 @@ have_other_tributary_relation_trigger = {
 	}
 }
 
+i_am_overload_trigger = {
+	AND = {
+		has_variable_list = tributaries
+		NOT = { has_variable = is_tributary }
+		NOT = { has_variable = overload }
+	}
+}
+
+i_am_tributary_trigger = {
+	AND = {
+		has_variable = is_tributary
+		has_variable = overload
+		is_valid_tributary_relation_trigger = { OVERLOAD = var:overload TRIBUTARY = root }
+	}
+}

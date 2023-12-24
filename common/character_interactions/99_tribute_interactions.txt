@@ -19,6 +19,7 @@ establish_tributary_interactions = {
 	# どういうときに表示されるか
 	is_shown = {
 		NOT = { scope:actor = scope:recipient }
+		scope:actor = {is_independent_ruler = yes}
 		# 宗主
 		scope:actor = {
 			highest_held_title_tier > tier_duchy
@@ -51,6 +52,13 @@ establish_tributary_interactions = {
 			text = we_have_tributary_relation
 			NOT = { is_valid_tributary_relation_trigger = { OVERLOAD = scope:actor TRIBUTARY = scope:recipient } }
 		}
+
+		custom_tooltip = {
+			text = i_am_tributary
+			NOT = { scope:actor = { i_am_tributary_trigger = yes } }
+		}
+
+		scope:actor = {is_independent_ruler = yes}
 
 		scope:recipient = {
 			is_at_war = no
@@ -125,6 +133,7 @@ become_tributary_interactions = {
 		adult = yes
 	}
 	ai_frequency = 12
+	ai_maybe = yes
 
 
 	is_shown = {
@@ -147,6 +156,11 @@ become_tributary_interactions = {
 		custom_tooltip = {
 			text = i_have_already_other_tributary_relation
 			NOT = { have_other_tributary_relation_trigger = { OVERLOAD = scope:recipient TRIBUTARY = scope:actor } }
+		}
+		# 私は宗主国である
+		custom_tooltip = {
+			text = i_am_overload
+			scope:actor = { NOT = { i_am_overload_trigger = yes } }
 		}
 
 		scope:actor = {
