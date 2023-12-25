@@ -22,6 +22,10 @@
   CALL_OVERLOAD_DEFENSIVE_WAR_NOTIFICATION:0 "TR As the Head of the House [actor.GetHouse.GetName], I call on you to join me in the [target.GetName]!"
   call_overload_to_defensive_war_interaction_same_overload:0 "We have the same overlord"
 
+  # 朝貢国->宗主国 `宗主国の封臣による朝貢国への攻撃戦争`の停止要請
+  request_stop_attacker_vassal_war_interaction: "Request Stop Vassal Attack War"
+  request_stop_attacker_vassal_war_interaction_desc: "request_stop_attacker_vassal_war_interaction_desc"
+
   # 既に朝貢関係である
   we_have_tributary_relation: "We have already Tributary Relation"
   # これは他国の朝貢国である
@@ -34,6 +38,8 @@
   i_am_overload: "I am Overload State"
   # 私は朝貢国である
   i_am_tributary: "I am Tributary State"
+  # 私はこのキャラクターのTopLiegeと朝貢関係にない
+  i_do_not_have_tributary_relation_with_this_characters_top_liege: "I do not have tributary relation with [recipient.GetHerHis] [top_liege|E]"
 
   # あなたの君主と朝貢関係にある
   this_state_has_tributary_relationship_with_your_liege: "This State has a tributary relationship with your Liege"

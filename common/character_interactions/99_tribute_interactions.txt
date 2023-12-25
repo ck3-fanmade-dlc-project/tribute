@@ -906,3 +906,54 @@ call_overload_to_defensive_war_interaction = {
 
 	send_options_exclusive = no
 }
+
+# 朝貢国->宗主国 `宗主国の封臣による朝貢国への攻撃戦争`の停止要請
+request_stop_attacker_vassal_war_interaction = {
+	category = interaction_category_diplomacy
+	special_interaction = interfere_in_war_interaction
+	# ai_accept_negotiation = yes
+	popup_on_receive = yes
+	pause_on_receive = yes
+	icon = icon_retreat
+
+	# send_name = "SEND_DEMAND"
+	
+	ai_maybe = yes
+	
+	prompt = STOP_VASSAL_WAR_ATTACKER
+
+	# interface_priority = 60
+
+	desc = request_stop_attacker_vassal_war_interaction_desc
+
+	is_shown = {
+		# i_am_tributary_trigger = yes
+		scope:actor = {
+			any_character_war = {
+				is_war_leader = scope:recipient
+				primary_attacker = scope:recipient
+				primary_defender = scope:actor
+			}
+		}
+	}
+	is_valid_showing_failures_only = {
+		custom_tooltip = {
+			text = i_do_not_have_tributary_relation_with_this_characters_top_liege
+			is_valid_tributary_relation_trigger = { OVERLOAD = scope:recipient.top_liege TRIBUTARY = scope:actor }
+		}
+	}
+
+	auto_accept = yes
+	on_auto_accept = {
+		scope:recipient = {
+			every_character_war = {
+				limit = {
+					is_war_leader = scope:recipient
+					primary_attacker = scope:recipient
+					primary_defender = scope:actor
+				}
+				end_war = white_peace 
+			}
+		}
+	}
+}
