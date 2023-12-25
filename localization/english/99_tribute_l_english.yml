@@ -23,7 +23,7 @@
   call_overload_to_defensive_war_interaction_same_overload:0 "We have the same overlord"
 
   # 朝貢国->宗主国 `宗主国の封臣による朝貢国への攻撃戦争`の停止要請
-  request_stop_attacker_vassal_war_interaction: "Request Stop Vassal Attack War"
+  request_stop_attacker_vassal_war_interaction: "Request Stop Vassal Offensive War"
   request_stop_attacker_vassal_war_interaction_desc: "request_stop_attacker_vassal_war_interaction_desc"
 
   # 既に朝貢関係である
