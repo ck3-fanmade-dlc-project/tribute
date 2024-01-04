@@ -53,7 +53,12 @@ tribute_interaction.0010 = {
 	sender = scope:recipient
 
 	immediate = {
-		show_as_tooltip = { offer_fealty_interaction_effect = yes }
+		show_as_tooltip = { 
+			establish_tributary_interaction_effect = {
+				OVERLOAD = scope:recipient
+				TRIBUTARY = scope:actor
+			}
+		 }
 	}
 
 	option = {

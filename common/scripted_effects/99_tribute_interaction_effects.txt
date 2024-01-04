@@ -66,6 +66,16 @@ establish_tributary_interaction_effect = {
 			days = 364
 		}
 	}
+
+	# 属国扱いで地図の色を変えてあげる
+	if = {
+		limit = {
+			$OVERLOAD$.primary_title.tier > $TRIBUTARY$.primary_title.tier
+		}
+		$TRIBUTARY$.primary_title = {
+			set_color_from_title = $OVERLOAD$.primary_title
+		}
+	}
 }
 
 broke_tributary_relation_effect = {
@@ -84,6 +94,15 @@ broke_tributary_relation_effect = {
 		$TRIBUTARY$ = {
 			remove_variable = is_tributary
 			remove_variable = overload
+		}
+
+		if = {
+			limit = {
+				$TRIBUTARY$.primary_title.tier < tier_empire
+			}
+			$TRIBUTARY$.primary_title = {
+				set_color_from_title = $TRIBUTARY$.primary_title.title_capital_county.title_province.barony
+			}
 		}
 	}
 }
